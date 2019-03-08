@@ -1,19 +1,5 @@
 import numpy as np
-from enum import Enum
-
-
-class Value(Enum):
-    Empty = 1
-    Can = 2
-    Wall = 3
-
-
-class Action(Enum):
-    Move_North = 1
-    Move_South = 2
-    Move_East = 3
-    Move_West = 4
-    Pick_Up = 5
+import src.environment as env
 
 
 class Problem:
@@ -43,16 +29,30 @@ class Grid:
         return 0 <= row < self._row_bound and 0 <= col < self._col_bound
 
     def retrieve_sensor_inputs(self, row, col):
-        values = [(row,col),(row-1,col),(row+1,col),(row,col-1),(row,col+1)]
-        for r,c in values:
-            if not self.in_bounds(r,c):
-                values.append((r,c,-1))
+        values = [(row,col),(row+1,col),(row-1,col),(row,col+1),(row,col-1)]
+        options = []
+        for i in range(5):
+            if not self.in_bounds(values[i][0], values[i][1]):
+                options.append((env.SensorPosition(i), env.SensorValue.Wall))
             else:
-                values.append((r,c,self.grid[r,c]))
+                if self.grid[values[i][0],values[i][1]] == 0:
+                    options.append((env.SensorPosition(i), env.SensorValue.Empty))
+                else:
+                    options.append((env.SensorPosition(i), env.SensorValue.Can))
+        return options
 
-    def take_action(self, row, col, clean):
-        if clean:
-            self.grid[row,col] = 0
+    def take_action(self, action, position):
+        if action == env.Action.Move_North:
+            return position[0]+1, position[1]
+        elif action == env.Action.Move_South:
+            return position[0]-1, position[1]
+        elif action == env.Action.Move_West:
+            return position[0], position[1]-1
+        elif action == env.Action.Move_East:
+            return position[0], position[1]+1
+        else:
+            self.grid[position[0], position[1]] = 0
+            return position
 
 
 class Agent:
