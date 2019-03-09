@@ -1,5 +1,5 @@
 import numpy as np
-import environment as env
+import src.environment as env
 
 
 class Grid:
@@ -22,7 +22,7 @@ class Grid:
         return 0 <= row < self._row_bound and 0 <= col < self._col_bound
 
     def retrieve_sensor_inputs(self, row, col):
-        values = [(row,col),(row+1,col),(row-1,col),(row,col+1),(row,col-1)]
+        values = [(row,col),(row-1,col),(row+1,col),(row,col+1),(row,col-1)]
         options = []
         for i in range(5):
             if not self.in_bounds(values[i][0], values[i][1]):
@@ -36,9 +36,9 @@ class Grid:
 
     def perform_action(self, action, position):
         if action == env.Action.Move_North:
-            return self.evaluate_position(position[0]+1, position[1], position)
-        elif action == env.Action.Move_South:
             return self.evaluate_position(position[0]-1, position[1], position)
+        elif action == env.Action.Move_South:
+            return self.evaluate_position(position[0]+1, position[1], position)
         elif action == env.Action.Move_West:
             return self.evaluate_position(position[0], position[1]-1, position)
         elif action == env.Action.Move_East:
@@ -47,6 +47,7 @@ class Grid:
             if self.grid[position[0], position[1]] == 0:
                 return position, -1
             else:
+                self.grid[position[0], position[1]] = 0
                 return position, 0
 
     def evaluate_position(self, x, y, original_position):
@@ -55,5 +56,10 @@ class Grid:
         return (x,y), 0
 
 
-#g = Grid(10,10)
-#print("done")
+"""
+g = Grid(10,10)
+x = g.retrieve_sensor_inputs(0,0)
+print(x[1][1])
+print(x[1][1] == env.SensorValue.Wall)
+print("done")
+"""
