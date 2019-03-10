@@ -1,5 +1,6 @@
 import numpy as np
 import src.environment as env
+import decimal as dec
 
 
 class Policy:
@@ -10,7 +11,8 @@ class Policy:
         self._actions = actions
         self._n = n
         self._y = y
-        self._e = e
+        self._e = round(dec.Decimal(e),2)
+        self._e_counter = 0
 
     @staticmethod
     def _create_input_index_mapping():
@@ -27,6 +29,15 @@ class Policy:
                 i += 1
         return d
 
+    def update_e(self, epoch):
+        if self._e != 1:
+            if self._e_counter % 50 == 0:
+                self._e += round(dec.Decimal(0.01),2)
+            self._e_counter += 1
+
+    def reset_e(self):
+        self._e = round(dec.Decimal(0.10),2)
+
     def choose_action(self, available_inputs):
         available_actions = self._retrieve_values_actions_from(available_inputs)
         q_values = [val[0] for val in available_actions]
@@ -39,10 +50,10 @@ class Policy:
             if best_action:
                 return best_action
             options = available_actions[:best_index] + available_actions[best_index+1:]
-            sum_probabilities = sum([x[0] for x in options])
+            sum_probabilities = sum([x[0] for x in options if x[0] >= 0])
             if sum_probabilities <= 0:
                 return self._uniform_random_selection(options)
-            return self._weighted_selection(options, sum_probabilities)
+            return self._weighted_selection([x for x in options if x[0] >= 0], sum_probabilities)
 
     @staticmethod
     def _uniform_random_selection(actions):
