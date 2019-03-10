@@ -38,11 +38,14 @@ class Problem:
             self.robby = Agent(self.grid, np.random.randint(0, 10), np.random.randint(0, 10), self.policy)
             reward_accumulated = self.train(m)
             print(i, self.policy._e, reward_accumulated)
+            if reward_accumulated > 350:
+                print(self.grid.grid)
         self.grid = Grid(10,10)
         print(self.grid.grid)
         self.robby = Agent(self.grid, np.random.randint(0, 10), np.random.randint(0, 10), self.policy)
         reward_accumulated = self.train(m)
         print(self.policy._e, reward_accumulated)
+        print(self.grid.grid)
 
 
 class Agent:
