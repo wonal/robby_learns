@@ -1,6 +1,7 @@
 import unittest
 import src.environment as env
 from src.grid import Grid
+# python -m unittest discover -s Tests -p "*_tests.py"
 
 
 class GridTests(unittest.TestCase):
@@ -80,7 +81,13 @@ class GridTests(unittest.TestCase):
         self.assertTrue(self.grid.grid[row,col] == 0)
 
     def test_valid_move(self):
+        self.grid.grid[0,1] = 0
         self.assertEqual(self.grid.perform_action(env.Action.Move_East, (0,0)), ((0,1),0))
+
+    def test_move_to_same_position(self):
+        self.grid.perform_action(env.Action.Move_East, (0,0))
+        self.grid.grid[0,1] = 0
+        self.assertEqual(self.grid.perform_action(env.Action.Move_East, (0,0)), ((0,1),-1))
 
 
 if __name__ == '__main__':

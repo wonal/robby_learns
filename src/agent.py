@@ -44,6 +44,7 @@ class Problem:
         reward_accumulated = self.train(m)
         print(self.policy._e, reward_accumulated)
 
+
 class Agent:
 
     def __init__(self, grid, starting_row, starting_col, policy):
@@ -62,8 +63,6 @@ class Agent:
 
 
 p = Problem(10,10)
-print(p.grid.grid)
 #p.train(200)
 p.run(5000,200)
-print(p.grid.grid)
 
