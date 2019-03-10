@@ -48,7 +48,7 @@ class Grid:
                 return position, -1
             else:
                 self.grid[position[0], position[1]] = 0
-                return position, 0
+                return position, 10
 
     def evaluate_position(self, x, y, original_position):
         if not self.in_bounds(x, y):
