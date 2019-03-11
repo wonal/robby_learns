@@ -30,9 +30,9 @@ class Policy:
         return d
 
     def update_e(self, epoch):
-        if self._e != 1:
+        if self._e != 0.1:
             if self._e_counter % 50 == 0:
-                self._e += round(dec.Decimal(0.01),2)
+                self._e -= round(dec.Decimal(0.01),2)
             self._e_counter += 1
 
     def reset_e(self):
