@@ -29,16 +29,31 @@ class Policy:
                 i += 1
         return d
 
-    def update_e(self, epoch):
+    def update_e(self):
+        """
+        Updates the epsilon value: every 50 episodes, decrements epsilon by 0.01 until it reaches 0.1, and then it
+        remains fixed at 0.1
+        """
         if self._e != 0.1:
             if self._e_counter % 50 == 0:
                 self._e -= round(dec.Decimal(0.01),2)
             self._e_counter += 1
 
     def reset_e(self):
+        """
+        Resets epsilon to 0.1
+        """
         self._e = round(dec.Decimal(0.10),2)
 
     def choose_action(self, available_inputs):
+        """
+        Given a list of available inputs (list of (state position, state value) tuples), finds the associated
+        q-values for those inputs.  If all of the q-values are 0, selects an action at random uniformly.  Otherwise,
+        finds the action with the best q-value and selects that with probability 1-epsilon; else, performs a weighted
+        selection.
+        :param available_inputs:
+        :return: An action captured as a 4-tuple (q-value, state position, state value, action)
+        """
         available_actions = self._retrieve_values_actions_from(available_inputs)
         q_values = [val[0] for val in available_actions]
         if sum(q_values) == 0:
@@ -57,17 +72,31 @@ class Policy:
 
     @staticmethod
     def _uniform_random_selection(actions):
+        """
+        Performs uniform random selection given a list of 4-tuples (q-value, state position, state value, action)
+        :return: a random tuple sample
+        """
         probabilities = [1/len(actions) for x in actions]
         action = np.random.choice(list(range(len(actions))), p=probabilities)
         return actions[action]
 
     @staticmethod
     def _weighted_selection(actions, total):
+        """
+        Performs a weighted selection based on q-value.
+        :param actions: list of 4-tuple (q-value, state position, state value, action)
+        :param total: the sum of all positive q-values in the actions list
+        :return: a random sample chosen based on q-value weights
+        """
         probabilities = [x[0]/total for x in actions]
         best_action = np.random.choice(list(range(len(actions))), p=probabilities)
         return actions[best_action]
 
     def _retrieve_values_actions_from(self, inputs):
+        """
+        Given a list of states (env.SensorPosition.North, env.SensorValue.Can), looks up the corresponding index in the
+        Q-table.  Concatenates all of the results.
+        """
         available_actions = []
         for sensor_input in inputs:
             for i in range(len(self.q_table[self.input_to_index[(sensor_input[0].value, sensor_input[1].value)]])):
@@ -75,14 +104,16 @@ class Policy:
         return available_actions # [(q-value,state,value,action)]
 
     def update(self, state, action, reward, next_inputs):
+        """
+        Update function
+        :param state: Tuple of the form (location, value) -- (env.SensorPosition.North, env.SensorValue.Can), etc.
+        :param action: best action
+        :param reward: reward associated with the best action
+        :param next_inputs: list of states
+        """
         state_index = self.input_to_index[(state[0].value, state[1].value)]
         next_q_values = [q[0] for q in self._retrieve_values_actions_from(next_inputs)]
         self.q_table[state_index, action.value] = self.q_table[state_index, action.value] + \
             self._n * (reward + self._y*(max(next_q_values)) - self.q_table[state_index, action.value])
 
-"""
-p = Policy(env.ACTIONS, 0.2, 0.9, 0.1)
-test = []
-print("done")
-"""
 

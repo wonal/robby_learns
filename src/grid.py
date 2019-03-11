@@ -20,9 +20,18 @@ class Grid:
         return g
 
     def in_bounds(self, row, col):
+        """
+        Determines if a position is in the bounds of the grid
+        :return: boolean
+        """
         return 0 <= row < self._row_bound and 0 <= col < self._col_bound
 
     def retrieve_sensor_inputs(self, row, col):
+        """
+        For a position, retrieves the five inputs corresponding to the five positions (current, north, south,
+        east, and west)
+        :return: List of tuples (position, value) such as (north, empty)
+        """
         values = [(row,col),(row-1,col),(row+1,col),(row,col+1),(row,col-1)]
         options = []
         for i in range(5):
@@ -36,6 +45,10 @@ class Grid:
         return options
 
     def perform_action(self, action, position):
+        """
+        Depending on the action for a given position, makes a move and evaluates the appropriate reward or penalty.
+        :return: An updated position if appropriate and the associated reward or penalty
+        """
         if action == env.Action.Move_North:
             return self._evaluate_position(position[0] - 1, position[1], position)
         elif action == env.Action.Move_South:
@@ -52,23 +65,28 @@ class Grid:
                 return position, 10
 
     def _evaluate_position(self, x, y, original_position):
+        """
+        Determines whether a penalty should be given for crashing into a wall.  If not, calls the function
+        to determine whether a penalty should be given for visiting a repeated state.
+        :param x: row
+        :param y: column
+        :param original_position: the original position before the move as a tuple (x,y)
+        :return: the updated position if appropriate, and reward/penalty
+        """
         if not self.in_bounds(x, y):
             return original_position, -5
         return self._assess_visited((x,y))
 
     def _assess_visited(self, p):
+        """
+        Checks whether the position has been visited already and if so, returns a penalty of -1.
+        Else, adds the position to the visited dictionary
+        :param p: position as a tuple (x,y)
+        :return: position, reward/penalty
+        """
         if p in self._visited:
             if self.grid[p[0], p[1]] == 0:
                 return p, -1
         self._visited[p] = 1
         return p, 0
 
-"""
-g = Grid(10,10)
-pos = (0,0)
-g.grid[0,1] = 0
-g.grid[0,1] = 0
-print(g.perform_action(env.Action.Move_East, pos)) #(1,2)
-print(g.perform_action(env.Action.Move_East, pos)) #(1,2)
-print("done")
-"""

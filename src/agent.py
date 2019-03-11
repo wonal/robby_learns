@@ -14,29 +14,45 @@ class Problem:
         self.epoch = 1
         self.rewards_per_episode = []
 
-    def run_n_steps(self, steps):
-        for i in range(steps):
-            self.robby.take_action()
-        return self.robby.total_reward
-
     def run(self, n, m):
+        """
+        Run a training session (runs the robot for m steps, n times) and create a plot, saved in src/training_plot.png.
+        Then runs a test session, retuning the mean and standard deviation.
+        :param n: The number of episodes
+        :param m: The number of steps
+        :return: mean, standard deviation
+        """
         self._train(n, m)
         return self._test(n, m)
 
     def _train(self, episodes, steps):
+        """
+        Runs the robot for a certain number of steps (steps), and runs this a certain number of times (episodes).
+        Each episode, the epsilon value is updated, a new grid is generated along with a starting position for the
+        robot. The total reward accumulated per episode is tracked in the rewards_per_episode list. A training plot
+        is then created and saved.
+        """
         print("Beginning Training...\n")
         for i in range(episodes):
             reward_accumulated = self.run_n_steps(steps)
-            self.policy.update_e(self.epoch)
+            self.policy.update_e()
             self.epoch += 1
             self.grid = Grid(env.GRID_BOUND, env.GRID_BOUND)
             self.robby = Agent(self.grid, np.random.randint(0, env.GRID_BOUND), np.random.randint(0, env.GRID_BOUND), self.policy)
             if self.epoch % 100 == 0:
                 self.rewards_per_episode.append(reward_accumulated)
-            print(i, self.policy._e, reward_accumulated)
+            print("Episode: {}, total reward for episode: {}".format(i+1, reward_accumulated))
         self._create_training_plot()
 
     def _test(self, episodes, steps):
+        """
+        Runs a test session where the epsilon value is fixed at a value, and the robot takes a certain number
+        of steps (steps), for a certain number of episodes (episodes).  Total rewards per episode are tracked and
+        the mean and standard deviation are returned.
+        :param episodes:
+        :param steps:
+        :return:
+        """
         print("Beginning Test...\n")
         self.policy.reset_e()
         self.rewards_per_episode = []
@@ -45,8 +61,18 @@ class Problem:
             self.robby = Agent(self.grid, np.random.randint(0, env.GRID_BOUND), np.random.randint(0, env.GRID_BOUND), self.policy)
             reward_accumulated = self.run_n_steps(steps)
             self.rewards_per_episode.append(reward_accumulated)
-            print(i, self.policy._e, reward_accumulated)
+            print("Episode: {}, total reward for episode: {}".format(i+1, reward_accumulated))
         return self._calculate_test_mean_std()
+
+    def run_n_steps(self, steps):
+        """
+        Run the robot for a certain number of steps.
+        :param steps: number of steps to run the simulation
+        :return: the reward accumulated
+        """
+        for i in range(steps):
+            self.robby.take_action()
+        return self.robby.total_reward
 
     def _create_training_plot(self):
         episodes = [x*100 for x in range(1,51)]
@@ -68,6 +94,11 @@ class Agent:
         self.total_reward = 0
 
     def take_action(self):
+        """
+        Retrieves inputs from local surroundings based on robot's current position.  Based on those inputs and the
+        Q-table, chooses and action using e-greedy selection, performs that action, receives the appropriate reward
+        or penalty, updates the robot's position accordingly and then updates the q-table.
+        """
         percepts = self.grid.retrieve_sensor_inputs(self.position[0], self.position[1])
         q_value, state, value, best_action = self.policy.choose_action(percepts)
         next_position, reward = self.grid.perform_action(best_action, self.position)
@@ -76,6 +107,4 @@ class Agent:
         self.policy.update((state,value), best_action, reward, self.grid.retrieve_sensor_inputs(self.position[0], self.position[1]))
 
 
-p = Problem(env.GRID_BOUND, env.GRID_BOUND)
-print(p.run(5000,200))
 
