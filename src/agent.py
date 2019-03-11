@@ -9,7 +9,7 @@ class Problem:
 
     def __init__(self, row_sz, col_sz):
         self.grid = Grid(row_sz, col_sz)
-        self.policy = Policy(env.ACTIONS, 0.2, 0.9, 0.1)
+        self.policy = Policy(env.ACTIONS, 0.2, 0.9, 1.0)
         self.robby = Agent(self.grid, np.random.randint(0, row_sz), np.random.randint(0, col_sz), self.policy)
         self.epoch = 1
         self.rewards_per_episode = []
@@ -20,9 +20,13 @@ class Problem:
         return self.robby.total_reward
 
     def run(self, n, m):
+        self._train(n, m)
+        return self._test(n, m)
+
+    def _train(self, episodes, steps):
         print("Beginning Training...\n")
-        for i in range(n): #episodes
-            reward_accumulated = self.train(m)
+        for i in range(episodes): #episodes
+            reward_accumulated = self.train(steps)
             self.policy.update_e(self.epoch)
             self.epoch += 1
             self.grid = Grid(10,10)
@@ -31,13 +35,15 @@ class Problem:
                 self.rewards_per_episode.append(reward_accumulated)
             print(i, self.policy._e, reward_accumulated)
         self._create_training_plot()
+
+    def _test(self, episodes, steps):
         print("Beginning Test...\n")
         self.policy.reset_e()
         self.rewards_per_episode = []
-        for i in range(n):
+        for i in range(episodes):
             self.grid = Grid(10,10)
             self.robby = Agent(self.grid, np.random.randint(0, 10), np.random.randint(0, 10), self.policy)
-            reward_accumulated = self.train(m)
+            reward_accumulated = self.train(steps)
             self.rewards_per_episode.append(reward_accumulated)
             print(i, self.policy._e, reward_accumulated)
         return self._calculate_test_mean_std()
@@ -71,6 +77,5 @@ class Agent:
 
 
 p = Problem(10,10)
-#p.train(200)
 print(p.run(5000,200))
 
