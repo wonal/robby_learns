@@ -8,6 +8,7 @@ class Grid:
         self.grid = self._initialize_grid(row_sz, col_sz)
         self._row_bound = row_sz
         self._col_bound = col_sz
+        self._visited = {}
 
     @staticmethod
     def _initialize_grid(rows, cols):
@@ -36,13 +37,13 @@ class Grid:
 
     def perform_action(self, action, position):
         if action == env.Action.Move_North:
-            return self.evaluate_position(position[0]-1, position[1], position)
+            return self._evaluate_position(position[0] - 1, position[1], position)
         elif action == env.Action.Move_South:
-            return self.evaluate_position(position[0]+1, position[1], position)
+            return self._evaluate_position(position[0] + 1, position[1], position)
         elif action == env.Action.Move_West:
-            return self.evaluate_position(position[0], position[1]-1, position)
+            return self._evaluate_position(position[0], position[1] - 1, position)
         elif action == env.Action.Move_East:
-            return self.evaluate_position(position[0], position[1]+1, position)
+            return self._evaluate_position(position[0], position[1] + 1, position)
         else:
             if self.grid[position[0], position[1]] == 0:
                 return position, -1
@@ -50,16 +51,24 @@ class Grid:
                 self.grid[position[0], position[1]] = 0
                 return position, 10
 
-    def evaluate_position(self, x, y, original_position):
+    def _evaluate_position(self, x, y, original_position):
         if not self.in_bounds(x, y):
             return original_position, -5
-        return (x,y), 0
+        return self._assess_visited((x,y))
 
+    def _assess_visited(self, p):
+        if p in self._visited:
+            if self.grid[p[0], p[1]] == 0:
+                return p, -1
+        self._visited[p] = 1
+        return p, 0
 
 """
 g = Grid(10,10)
-x = g.retrieve_sensor_inputs(0,0)
-print(x[1][1])
-print(x[1][1] == env.SensorValue.Wall)
+pos = (0,0)
+g.grid[0,1] = 0
+g.grid[0,1] = 0
+print(g.perform_action(env.Action.Move_East, pos)) #(1,2)
+print(g.perform_action(env.Action.Move_East, pos)) #(1,2)
 print("done")
 """
