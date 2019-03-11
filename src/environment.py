@@ -26,3 +26,8 @@ class Action(Enum):
 INPUT = [SensorPosition.Current, SensorPosition.North, SensorPosition.South, SensorPosition.East, SensorPosition.West]
 VALUES = [SensorValue.Empty, SensorValue.Can, SensorValue.Wall]
 ACTIONS = [Action.Move_North, Action.Move_South, Action.Move_East, Action.Move_West, Action.Pick_Up]
+
+ETA = 0.2
+GAMMA = 0.9
+EPSILON = 1.0
+GRID_BOUND = 10

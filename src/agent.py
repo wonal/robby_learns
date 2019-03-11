@@ -9,7 +9,7 @@ class Problem:
 
     def __init__(self, row_sz, col_sz):
         self.grid = Grid(row_sz, col_sz)
-        self.policy = Policy(env.ACTIONS, 0.2, 0.9, 1.0)
+        self.policy = Policy(env.ACTIONS, env.ETA, env.GAMMA, env.EPSILON)
         self.robby = Agent(self.grid, np.random.randint(0, row_sz), np.random.randint(0, col_sz), self.policy)
         self.epoch = 1
         self.rewards_per_episode = []
@@ -25,12 +25,12 @@ class Problem:
 
     def _train(self, episodes, steps):
         print("Beginning Training...\n")
-        for i in range(episodes): #episodes
+        for i in range(episodes):
             reward_accumulated = self.run_n_steps(steps)
             self.policy.update_e(self.epoch)
             self.epoch += 1
-            self.grid = Grid(10,10)
-            self.robby = Agent(self.grid, np.random.randint(0, 10), np.random.randint(0, 10), self.policy)
+            self.grid = Grid(env.GRID_BOUND, env.GRID_BOUND)
+            self.robby = Agent(self.grid, np.random.randint(0, env.GRID_BOUND), np.random.randint(0, env.GRID_BOUND), self.policy)
             if self.epoch % 100 == 0:
                 self.rewards_per_episode.append(reward_accumulated)
             print(i, self.policy._e, reward_accumulated)
@@ -41,8 +41,8 @@ class Problem:
         self.policy.reset_e()
         self.rewards_per_episode = []
         for i in range(episodes):
-            self.grid = Grid(10,10)
-            self.robby = Agent(self.grid, np.random.randint(0, 10), np.random.randint(0, 10), self.policy)
+            self.grid = Grid(env.GRID_BOUND, env.GRID_BOUND)
+            self.robby = Agent(self.grid, np.random.randint(0, env.GRID_BOUND), np.random.randint(0, env.GRID_BOUND), self.policy)
             reward_accumulated = self.run_n_steps(steps)
             self.rewards_per_episode.append(reward_accumulated)
             print(i, self.policy._e, reward_accumulated)
@@ -76,6 +76,6 @@ class Agent:
         self.policy.update((state,value), best_action, reward, self.grid.retrieve_sensor_inputs(self.position[0], self.position[1]))
 
 
-p = Problem(10,10)
+p = Problem(env.GRID_BOUND, env.GRID_BOUND)
 print(p.run(5000,200))
 
