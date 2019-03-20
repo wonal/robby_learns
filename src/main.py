@@ -1,5 +1,4 @@
 import src.environment as env
-import sys
 from src.agent import Problem
 
 

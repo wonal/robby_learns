@@ -40,16 +40,16 @@ class GridTests(unittest.TestCase):
         self.assertEqual(self.end[3][1], env.SensorValue.Wall)
 
     def test_invalid_north_move(self):
-        self.assertEqual(self.grid.perform_action(env.Action.Move_North, (0,0)),((0,0),-5))
+        self.assertEqual(self.grid.perform_action(env.ActionMove.North, (0, 0)), ((0, 0), -5))
 
     def test_invalid_south(self):
-        self.assertEqual(self.grid.perform_action(env.Action.Move_South, (9,9)),((9,9),-5))
+        self.assertEqual(self.grid.perform_action(env.ActionMove.South, (9, 9)), ((9, 9), -5))
 
     def test_invalid_east(self):
-        self.assertEqual(self.grid.perform_action(env.Action.Move_East, (9,9)),((9,9),-5))
+        self.assertEqual(self.grid.perform_action(env.ActionMove.East, (9, 9)), ((9, 9), -5))
 
     def test_invalid_west(self):
-        self.assertEqual(self.grid.perform_action(env.Action.Move_West, (0,0)),((0,0),-5))
+        self.assertEqual(self.grid.perform_action(env.ActionMove.West, (0, 0)), ((0, 0), -5))
 
     def test_incorrect_pickup(self):
         can = True
@@ -63,7 +63,7 @@ class GridTests(unittest.TestCase):
                 can = False
             else:
                 col += 1
-        self.assertEqual(self.grid.perform_action(env.Action.Pick_Up, (row, col)), ((row, col), -1))
+        self.assertEqual(self.grid.perform_action(env.ActionMove.Pick_Up, (row, col)), ((row, col), -1))
 
     def test_can_pickup(self):
         empty = True
@@ -77,17 +77,17 @@ class GridTests(unittest.TestCase):
                 empty = False
             else:
                 col += 1
-        self.grid.perform_action(env.Action.Pick_Up, (row, col))
+        self.grid.perform_action(env.ActionMove.Pick_Up, (row, col))
         self.assertTrue(self.grid.grid[row,col] == 0)
 
     def test_valid_move(self):
         self.grid.grid[0,1] = 0
-        self.assertEqual(self.grid.perform_action(env.Action.Move_East, (0,0)), ((0,1),0))
+        self.assertEqual(self.grid.perform_action(env.ActionMove.East, (0, 0)), ((0, 1), 0))
 
     def test_move_to_same_position(self):
-        self.grid.perform_action(env.Action.Move_East, (0,0))
+        self.grid.perform_action(env.ActionMove.East, (0, 0))
         self.grid.grid[0,1] = 0
-        self.assertEqual(self.grid.perform_action(env.Action.Move_East, (0,0)), ((0,1),-1))
+        self.assertEqual(self.grid.perform_action(env.ActionMove.East, (0, 0)), ((0, 1), -1))
 
 
 if __name__ == '__main__':

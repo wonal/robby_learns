@@ -15,17 +15,17 @@ class SensorValue(Enum):
     Wall = 2
 
 
-class Action(Enum):
-    Move_North = 0
-    Move_South = 1
-    Move_East = 2
-    Move_West = 3
+class ActionMove(Enum):
+    North = 0
+    South = 1
+    East = 2
+    West = 3
     Pick_Up = 4
 
 
 INPUT = [SensorPosition.Current, SensorPosition.North, SensorPosition.South, SensorPosition.East, SensorPosition.West]
 VALUES = [SensorValue.Empty, SensorValue.Can, SensorValue.Wall]
-ACTIONS = [Action.Move_North, Action.Move_South, Action.Move_East, Action.Move_West, Action.Pick_Up]
+ACTIONS = [ActionMove.North, ActionMove.South, ActionMove.East, ActionMove.West, ActionMove.Pick_Up]
 
 ETA = 0.2
 GAMMA = 0.9
